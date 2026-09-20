@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Wellington Cerqueira — Python, Dados & Automação</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+
+    --bg: #0d1215;
+    --bg-panel: #131a1e;
+    --bg-panel-2: #171f24;
+    --line: rgba(237,238,235,0.10);
+    --line-strong: rgba(237,238,235,0.20);
+    --ink: #edeee9;
+    --ink-dim: #9aa3a0;
+    --ink-faint: #6b7371;
+    --amber: #d9a441;
+    --amber-dim: #a9803a;
+    --teal: #5fa8a0;
+    --teal-dim: #3f716c;
+    --danger-fade: #b06a4f;
+
+    --font-display: 'Space Grotesk', 'IBM Plex Sans', sans-serif;
+    --font-body: 'IBM Plex Sans', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: calc(72px + env(safe-area-inset-top, 0px)); }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 64px 64px;
+    opacity: 0.35;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 10%, transparent 70%);
+  }
+  a { color: inherit; }
+  img { max-width: 100%; }
+  .wrap { max-width: 1160px; margin: 0 auto; padding: 0 28px; position: relative; z-index: 1; }
+  ::selection { background: var(--amber); color: #14100a; }
+  :focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+  }
+
+  /* ---------- Nav ---------- */
+  header.nav {
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 50;
+    backdrop-filter: blur(10px);
+    background: rgba(13,18,21,0.82);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav-inner { display:flex; align-items:center; justify-content:space-between; padding: 16px 28px; max-width:1160px; margin:0 auto; }
+  .brand { font-family: var(--font-display); font-weight:600; font-size:1.05rem; letter-spacing:0.01em; display:flex; align-items:baseline; gap:8px; text-decoration:none;}
+  .brand .dot { color: var(--amber); font-family: var(--font-mono); }
+  nav.links { display:flex; gap: 28px; font-size: 0.92rem; }
+  nav.links a { text-decoration:none; color: var(--ink-dim); transition: color .15s ease; position:relative; }
+  nav.links a:hover, nav.links a:focus-visible { color: var(--ink); }
+  .nav-cta {
+    font-family: var(--font-mono); font-size:0.82rem; color: var(--amber); border:1px solid var(--amber-dim);
+    padding: 7px 14px; border-radius: 3px; text-decoration:none; white-space:nowrap; transition: background .15s ease, color .15s ease;
+  }
+  .nav-cta:hover, .nav-cta:focus-visible { background: var(--amber); color: #14100a; }
+  .menu-btn { display:none; background:none; border:1px solid var(--line-strong); color:var(--ink); padding:8px 10px; border-radius:3px; font-family: var(--font-mono); }
+
+  /* ---------- Hero ---------- */
+  .hero { padding: 96px 0 72px; position:relative; }
+  .kicker {
+    font-family: var(--font-mono); font-size: 0.82rem; color: var(--teal); display:flex; align-items:center; gap:10px; margin-bottom:26px;
+  }
+  .kicker::before { content:""; width:8px; height:8px; background: var(--teal); border-radius:50%; box-shadow: 0 0 0 3px rgba(95,168,160,0.18); }
+  h1.headline {
+    font-family: var(--font-display); font-weight:600; font-size: clamp(2.2rem, 5.4vw, 4rem);
+    line-height: 1.08; letter-spacing:-0.01em; margin: 0 0 26px; max-width: 15ch;
+  }
+  .hero-sub { font-size: 1.08rem; color: var(--ink-dim); max-width: 54ch; margin: 0 0 34px; }
+  .hero-grid { display:grid; grid-template-columns: 1.3fr 0.9fr; gap: 48px; align-items:start; }
+  .cta-row { display:flex; flex-wrap:wrap; gap: 12px; margin-bottom: 44px; }
+  .btn {
+    font-family: var(--font-body); font-weight:500; font-size:0.92rem; text-decoration:none; padding: 12px 20px; border-radius: 3px;
+    display:inline-flex; align-items:center; gap:8px; transition: transform .15s ease, background .15s ease, border-color .15s ease;
+  }
+  .btn-primary { background: var(--amber); color: #14100a; border: 1px solid var(--amber); }
+  .btn-primary:hover, .btn-primary:focus-visible { background:#e9b25c; }
+  .btn-ghost { border: 1px solid var(--line-strong); color: var(--ink); background:transparent; }
+  .btn-ghost:hover, .btn-ghost:focus-visible { border-color: var(--ink-dim); background: var(--bg-panel); }
+  .stack-line { font-family: var(--font-mono); font-size:0.82rem; color: var(--ink-faint); letter-spacing: 0.03em; }
+
+  .hero-console {
+    background: var(--bg-panel); border: 1px solid var(--line); border-radius: 6px; overflow:hidden;
+    font-family: var(--font-mono); font-size: 0.82rem;
+  }
+  .console-bar { display:flex; gap:6px; padding: 11px 14px; border-bottom: 1px solid var(--line); background: var(--bg-panel-2); }
+  .console-bar span { width:9px; height:9px; border-radius:50%; background: var(--line-strong); }
+  .console-body { padding: 16px 16px 18px; color: var(--ink-dim); white-space: pre-wrap; }
+  .console-body .p { color: var(--teal); }
+  .console-body .k { color: var(--amber); }
+  .console-cursor { display:inline-block; width:7px; height:14px; background: var(--amber); vertical-align: -2px; animation: blink 1.05s steps(1) infinite; }
+  @keyframes blink { 50% { opacity:0; } }
+
+  /* ---------- Section shell ---------- */
+  section { padding: 88px 0; border-top: 1px solid var(--line); position:relative; }
+  .eyebrow-row { display:flex; align-items:baseline; justify-content:space-between; gap: 20px; margin-bottom: 44px; flex-wrap:wrap; }
+  .section-title { font-family: var(--font-display); font-weight:600; font-size: clamp(1.5rem, 3vw, 2.1rem); margin:0; }
+  .section-idx { font-family: var(--font-mono); font-size:0.8rem; color: var(--ink-faint); }
+
+  /* ---------- Impact ---------- */
+  .impact { display:grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items:center; }
+  .impact-figure { display:flex; align-items:baseline; gap:18px; font-family: var(--font-display); }
+  .impact-figure .num { font-size: clamp(3.2rem, 9vw, 6rem); font-weight:700; line-height:1; }
+  .impact-figure .arrow { font-size: clamp(1.6rem, 4vw, 2.6rem); color: var(--ink-faint); font-weight:400; }
+  .impact-figure .num.before { color: var(--ink-faint); }
+  .impact-figure .num.after { color: var(--amber); }
+  .impact-unit { font-family: var(--font-mono); font-size:0.95rem; color: var(--ink-dim); margin-top:10px; }
+  .impact-pct { font-family: var(--font-mono); font-size:1.1rem; color: var(--teal); margin-top: 6px; }
+  .impact-note { color: var(--ink-dim); font-size: 0.98rem; max-width: 46ch; }
+  .impact-note strong { color: var(--ink); font-weight:600; }
+
+  /* ---------- Process ---------- */
+  .process-flow { display:grid; grid-template-columns: repeat(6, 1fr); gap: 0; }
+  .process-step { padding: 22px 16px 22px 0; border-right: 1px dashed var(--line); position:relative; }
+  .process-step:last-child { border-right:none; }
+  .process-step .pn { font-family: var(--font-mono); font-size:0.74rem; color: var(--amber); display:block; margin-bottom:10px; }
+  .process-step h3 { font-family: var(--font-display); font-size:1rem; font-weight:600; margin: 0 0 8px; }
+  .process-step p { font-size: 0.86rem; color: var(--ink-dim); margin:0; }
+
+  /* ---------- Timeline ---------- */
+  .timeline { position:relative; padding-left: 28px; }
+  .timeline::before { content:""; position:absolute; left:5px; top:6px; bottom:6px; width:1px; background: var(--line-strong); }
+  .t-item { position:relative; padding-bottom: 40px; }
+  .t-item:last-child { padding-bottom:0; }
+  .t-item::before { content:""; position:absolute; left: -28px; top: 4px; width: 11px; height:11px; border-radius:50%; background: var(--bg); border: 2px solid var(--teal); }
+  .t-item.active::before { background: var(--amber); border-color: var(--amber); }
+  .t-date { font-family: var(--font-mono); font-size:0.78rem; color: var(--ink-faint); margin-bottom: 6px; }
+  .t-title { font-family: var(--font-display); font-weight:600; font-size:1.12rem; margin: 0 0 6px; }
+  .t-org { color: var(--teal); font-size: 0.92rem; margin-bottom: 10px; }
+  .t-body { color: var(--ink-dim); font-size: 0.94rem; max-width: 62ch; }
+  .t-body ul { margin: 10px 0 0; padding-left: 18px; }
+  .t-body li { margin-bottom: 6px; }
+  .badge { display:inline-flex; align-items:center; gap:6px; font-family: var(--font-mono); font-size:0.76rem; color: var(--amber); border:1px solid var(--amber-dim); padding: 3px 9px; border-radius: 3px; margin-top: 12px; }
+
+  /* ---------- Projects ---------- */
+  .project-card {
+    background: var(--bg-panel); border:1px solid var(--line); border-radius: 8px; padding: 32px; cursor:pointer;
+    transition: border-color .15s ease;
+  }
+  .project-card:hover, .project-card:focus-within { border-color: var(--line-strong); }
+  .project-head { display:flex; justify-content:space-between; align-items:flex-start; gap:20px; flex-wrap:wrap; }
+  .project-name { font-family: var(--font-display); font-weight:600; font-size:1.4rem; margin: 0 0 8px; }
+  .project-tag { color: var(--ink-dim); font-size:0.95rem; margin:0; max-width: 60ch; }
+  .project-toggle {
+    font-family: var(--font-mono); font-size: 0.8rem; color: var(--ink-dim); background:none; border:1px solid var(--line-strong);
+    border-radius:3px; padding: 8px 12px; white-space:nowrap;
+  }
+  .project-stack { display:flex; flex-wrap:wrap; gap:8px; margin: 18px 0 0; }
+  .chip { font-family: var(--font-mono); font-size:0.74rem; color: var(--ink-dim); border:1px solid var(--line); padding:4px 9px; border-radius: 3px; }
+  .project-detail {
+    max-height: 0; overflow:hidden; transition: max-height .35s ease;
+  }
+  .project-detail.open { max-height: 1400px; }
+  .project-detail-inner { padding-top: 26px; margin-top: 26px; border-top:1px solid var(--line); display:grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+  .pd-block h4 { font-family: var(--font-mono); font-size:0.78rem; color: var(--amber); text-transform:none; margin: 0 0 10px; letter-spacing:0.02em; }
+  .pd-block p, .pd-block li { color: var(--ink-dim); font-size:0.92rem; }
+  .pd-block ul { margin:0; padding-left: 18px; }
+  .pd-block li { margin-bottom:6px; }
+  .arch-flow { display:flex; flex-wrap:wrap; align-items:center; gap:8px; font-family: var(--font-mono); font-size:0.78rem; color: var(--ink-dim); margin-top: 4px; }
+  .arch-flow .node { border:1px solid var(--line-strong); padding: 6px 10px; border-radius:3px; color: var(--ink); }
+  .arch-flow .sep { color: var(--ink-faint); }
+
+  /* ---------- Skills ---------- */
+  .skills-grid { display:grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--line); border:1px solid var(--line); border-radius:8px; overflow:hidden; }
+  .skill-cell { background: var(--bg-panel); padding: 26px 22px; }
+  .skill-cell h3 { font-family: var(--font-mono); font-size:0.82rem; color: var(--teal); margin: 0 0 16px; letter-spacing:0.02em; }
+  .skill-tags { display:flex; flex-wrap:wrap; gap:8px; }
+  .skill-tags span { font-size:0.86rem; color: var(--ink-dim); }
+  .skill-tags span:not(:last-child)::after { content:"·"; margin-left:8px; color: var(--ink-faint); }
+
+  /* ---------- Footer / contact ---------- */
+  .contact-inner { display:grid; grid-template-columns: 1.2fr 1fr; gap: 48px; align-items:end; }
+  .contact-title { font-family: var(--font-display); font-weight:600; font-size: clamp(1.8rem, 4vw, 2.6rem); margin:0 0 18px; max-width: 16ch; }
+  .contact-links { display:flex; flex-direction:column; gap: 14px; font-family: var(--font-mono); font-size:0.92rem; }
+  .contact-links a { text-decoration:none; color: var(--ink-dim); border-bottom: 1px solid transparent; transition: color .15s ease, border-color .15s ease; display:inline-flex; align-items:center; gap:10px; width:fit-content; }
+  .contact-links a:hover, .contact-links a:focus-visible { color: var(--amber); border-color: var(--amber-dim); }
+  footer.foot { padding: 28px 0; border-top:1px solid var(--line); text-align:center; font-family: var(--font-mono); font-size: 0.78rem; color: var(--ink-faint); }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 900px) {
+    nav.links { display:none; }
+    .menu-btn { display:inline-block; }
+    .hero-grid { grid-template-columns: 1fr; }
+    .impact { grid-template-columns: 1fr; gap: 30px; }
+    .process-flow { grid-template-columns: repeat(2, 1fr); }
+    .process-step { border-right:none; border-bottom: 1px dashed var(--line); padding: 18px 0; }
+    .project-detail-inner { grid-template-columns: 1fr; }
+    .skills-grid { grid-template-columns: 1fr 1fr; }
+    .contact-inner { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 560px) {
+    .wrap { padding: 0 18px; }
+    section { padding: 64px 0; }
+    .skills-grid { grid-template-columns: 1fr; }
+    .process-flow { grid-template-columns: 1fr; }
+  }
+
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      --bg: #0d1215; --bg-panel: #131a1e; --bg-panel-2: #171f24; --ink: #edeee9;
+    }
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a href="#top" class="brand">well<span class="dot">.dev</span></a>
+    <nav class="links">
+      <a href="#processo">Como trabalho</a>
+      <a href="#experiencia">Experiência</a>
+      <a href="#projetos">Projetos</a>
+      <a href="#skills">Tecnologias</a>
+      <a href="#contato">Contato</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero" style="border-top:none; padding-top:64px;">
+    <div class="wrap">
+      <div class="hero-grid">
+        <div>
+          <div class="kicker">Salvador, BA · disponível para estágio</div>
+          <h1 class="headline">Transformo processos manuais em soluções automatizadas.</h1>
+          <p class="hero-sub">Estudante de Análise e Desenvolvimento de Sistemas com experiência prática em automação de processos, análise de dados e desenvolvimento de soluções internas em ambiente corporativo real.</p>
+          <div class="cta-row">
+            <a class="btn btn-primary" href="#projetos">Ver projetos</a>
+            <a class="btn btn-ghost" href="https://github.com/TonCerques" target="_blank" rel="noopener">GitHub</a>
+            <a class="btn btn-ghost" href="https://www.linkedin.com/in/wellingtoncrq4" target="_blank" rel="noopener">LinkedIn</a>
+          </div>
+          <div class="stack-line">Python · Pandas · SQL · Selenium · SAP HANA · Automação de processos</div>
+        </div>
+        <div class="hero-console" aria-hidden="true">
+          <div class="console-bar"><span></span><span></span><span></span></div>
+          <div class="console-body" id="consoleBody"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- IMPACT -->
+  <section id="impacto">
+    <div class="wrap">
+      <div class="impact">
+        <div>
+          <div class="impact-figure">
+            <span class="num before">30</span>
+            <span class="arrow">→</span>
+            <span class="num after" id="impactNum">30</span>
+          </div>
+          <div class="impact-unit">minutos por execução → minutos por execução</div>
+          <div class="impact-pct">≈ 93% de redução no tempo da atividade</div>
+        </div>
+        <p class="impact-note">
+          Resultado de uma automação desenvolvida durante minha atuação como Jovem Aprendiz no Núcleo de Dados/Projetos da <strong>Neoenergia Coelba</strong>, em um dos núcleos mais atarefados da unidade de projetos de obra. Esse trabalho contribuiu para o reconhecimento como <strong>Funcionário do Mês</strong> entre mais de 200 colaboradores.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW I WORK -->
+  <section id="processo">
+    <div class="wrap">
+      <div class="eyebrow-row">
+        <h2 class="section-title">Como eu trabalho</h2>
+        <span class="section-idx">processo</span>
+      </div>
+      <div class="process-flow">
+        <div class="process-step"><span class="pn">01</span><h3>Problema</h3><p>Entendo a demanda antes de abrir o editor — quem é afetado e por quê.</p></div>
+        <div class="process-step"><span class="pn">02</span><h3>Análise</h3><p>Mapeio o processo atual e identifico onde o tempo e o esforço se perdem.</p></div>
+        <div class="process-step"><span class="pn">03</span><h3>Dados</h3><p>Levanto, limpo e organizo os dados envolvidos na rotina.</p></div>
+        <div class="process-step"><span class="pn">04</span><h3>Solução</h3><p>Desenho uma abordagem simples, testável e fácil de manter.</p></div>
+        <div class="process-step"><span class="pn">05</span><h3>Automação</h3><p>Implemento em Python o que antes era feito manualmente.</p></div>
+        <div class="process-step"><span class="pn">06</span><h3>Resultado</h3><p>Acompanho o impacto real: tempo, erros e produtividade da equipe.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section id="experiencia">
+    <div class="wrap">
+      <div class="eyebrow-row">
+        <h2 class="section-title">Experiência</h2>
+        <span class="section-idx">trajetória</span>
+      </div>
+      <div class="timeline">
+
+        <div class="t-item active">
+          <div class="t-date">10/2025 — atual</div>
+          <div class="t-title">Jovem Aprendiz — Núcleo de Dados / Projetos</div>
+          <div class="t-org">Neoenergia Coelba</div>
+          <div class="t-body">
+            Atuo em um ambiente de projetos e dados, recebendo demandas de análise, melhoria e automação de processos internos, com liberdade para propor soluções usadas por diferentes núcleos.
+            <ul>
+              <li>Automação que reduziu uma atividade de 30 min para 2 min por execução.</li>
+              <li>7 meses estruturando processos administrativos do núcleo de Embargos: análise de dados, criação de controles e redução de dependência de processos manuais.</li>
+              <li>Participação no levantamento e definição de indicadores em aberto do núcleo.</li>
+              <li>Reconhecido como Funcionário do Mês entre mais de 200 colaboradores da unidade de projetos de obra.</li>
+            </ul>
+            <span class="badge">Python · Pandas · SQL · SAP HANA · VBA · VBS</span>
+          </div>
+        </div>
+
+        <div class="t-item">
+          <div class="t-date">2024 — 2025</div>
+          <div class="t-title">Projetos acadêmicos aplicados</div>
+          <div class="t-org">SENAC/BA — Casa do Comércio</div>
+          <div class="t-body">
+            Liderança e gestão de equipe na criação de três projetos voltados à aplicação prática do ensino, simulando ambientes reais de trabalho (PDV, controle administrativo, indicadores e métricas), hoje usados nos cursos de Operadores de Caixa, Logística e Administração.
+          </div>
+        </div>
+
+        <div class="t-item">
+          <div class="t-date">06/2024 — 12/2025</div>
+          <div class="t-title">Técnico em Desenvolvimento de Sistemas</div>
+          <div class="t-org">SENAC/BA — concluído</div>
+          <div class="t-body">Base em desenvolvimento Full Stack, com destaque para Front-End, aplicada nos projetos acadêmicos do período.</div>
+        </div>
+
+        <div class="t-item">
+          <div class="t-date">a partir de 2026 · em curso</div>
+          <div class="t-title">Análise e Desenvolvimento de Sistemas</div>
+          <div class="t-org">UCSal — 3º semestre, previsão 12/2027</div>
+          <div class="t-body">Direção de carreira: Desenvolvimento → Automação → Dados → Engenharia de Dados.</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projetos">
+    <div class="wrap">
+      <div class="eyebrow-row">
+        <h2 class="section-title">Projetos</h2>
+        <span class="section-idx">destaque</span>
+      </div>
+
+      <div class="project-card" id="prdCard">
+        <div class="project-head">
+          <div>
+            <h3 class="project-name">PRD_SAC</h3>
+            <p class="project-tag">Sistema de atendimento (SAC) full stack, com robô em Python/Selenium para automatizar o ciclo de atendimento e um pipeline de dados para relatórios e métricas.</p>
+          </div>
+          <button class="project-toggle" id="prdToggle" aria-expanded="false" aria-controls="prdDetail">Ver case study ↓</button>
+        </div>
+        <div class="project-stack">
+          <span class="chip">Python</span><span class="chip">Selenium</span><span class="chip">Pandas</span>
+          <span class="chip">PHP</span><span class="chip">PostgreSQL</span><span class="chip">HTML/CSS</span><span class="chip">Render</span>
+        </div>
+        <div class="project-detail" id="prdDetail">
+          <div class="project-detail-inner">
+            <div class="pd-block">
+              <h4>Problema</h4>
+              <p>Simular uma operação de atendimento (SAC) com ciclo completo: abertura do atendimento, interação em chat, conclusão e expiração automática — sem intervenção manual no acompanhamento.</p>
+              <h4 style="margin-top:20px;">Solução</h4>
+              <p>Aplicação web full stack (PHP + PostgreSQL para o backend/dados, HTML/CSS na interface) combinada a um robô em Python com Selenium, responsável por automatizar interações e validar o fluxo de ponta a ponta.</p>
+            </div>
+            <div class="pd-block">
+              <h4>Automação</h4>
+              <p>O robô usa <code>WebDriverWait</code> e espera explícita para lidar com latência, carregamento de página e cold start do servidor hospedado em nuvem (Render).</p>
+              <h4 style="margin-top:20px;">Engenharia de dados</h4>
+              <ul>
+                <li>Extração de dados tabulares do sistema</li>
+                <li>Limpeza e normalização com Pandas</li>
+                <li>Processamento em memória</li>
+                <li>Geração de relatórios e métricas de acompanhamento</li>
+              </ul>
+            </div>
+          </div>
+          <div style="margin-top:26px;">
+            <h4 style="font-family: var(--font-mono); font-size:0.78rem; color: var(--amber); margin:0 0 10px;">Arquitetura</h4>
+            <div class="arch-flow">
+              <span class="node">Usuário</span><span class="sep">→</span>
+              <span class="node">Sistema Web</span><span class="sep">→</span>
+              <span class="node">Banco de Dados</span><span class="sep">→</span>
+              <span class="node">Python / Selenium</span><span class="sep">→</span>
+              <span class="node">Pandas</span><span class="sep">→</span>
+              <span class="node">Relatórios</span>
+            </div>
+          </div>
+          <div style="margin-top:24px;">
+            <a class="btn btn-ghost" href="https://github.com/TonCerques/PRD_SAC" target="_blank" rel="noopener">Ver no GitHub</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section id="skills">
+    <div class="wrap">
+      <div class="eyebrow-row">
+        <h2 class="section-title">Tecnologias</h2>
+        <span class="section-idx">por área</span>
+      </div>
+      <div class="skills-grid">
+        <div class="skill-cell">
+          <h3>Python</h3>
+          <div class="skill-tags"><span>Automação</span><span>Dados</span><span>Selenium</span><span>Pandas</span><span>Scripts</span></div>
+        </div>
+        <div class="skill-cell">
+          <h3>SQL</h3>
+          <div class="skill-tags"><span>Consultas</span><span>Views</span><span>Subqueries</span><span>Modelagem</span><span>SAP HANA</span></div>
+        </div>
+        <div class="skill-cell">
+          <h3>Automação</h3>
+          <div class="skill-tags"><span>Web</span><span>Desktop</span><span>VBA</span><span>VBS</span><span>Selenium</span></div>
+        </div>
+        <div class="skill-cell">
+          <h3>Dados</h3>
+          <div class="skill-tags"><span>Limpeza</span><span>Normalização</span><span>Relatórios</span><span>Indicadores</span></div>
+        </div>
+        <div class="skill-cell">
+          <h3>Linguagens</h3>
+          <div class="skill-tags"><span>Python</span><span>SQL</span><span>PHP</span><span>JavaScript</span><span>HTML</span><span>CSS</span></div>
+        </div>
+        <div class="skill-cell">
+          <h3>Bancos de dados</h3>
+          <div class="skill-tags"><span>SAP HANA</span><span>MySQL</span><span>PostgreSQL</span></div>
+        </div>
+        <div class="skill-cell">
+          <h3>Desenvolvimento</h3>
+          <div class="skill-tags"><span>Git</span><span>GitHub</span><span>APIs</span><span>Full Stack</span></div>
+        </div>
+        <div class="skill-cell">
+          <h3>Processos</h3>
+          <div class="skill-tags"><span>Scrum</span><span>Kanban</span><span>Fluxogramas</span><span>Documentação técnica</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contato">
+    <div class="wrap">
+      <div class="contact-inner">
+        <div>
+          <h2 class="contact-title">Vamos conversar sobre a próxima automação.</h2>
+          <p class="impact-note">Aberto a oportunidades de estágio ou posição júnior em Python, Dados ou Automação de Processos.</p>
+        </div>
+        <div class="contact-links">
+          <a href="mailto:wellingtoncrq4@gmail.com">wellingtoncrq4@gmail.com</a>
+          <a href="tel:+557198851010">+55 71 98851-0010</a>
+          <a href="https://www.linkedin.com/in/wellingtoncrq4" target="_blank" rel="noopener">linkedin.com/in/wellingtoncrq4</a>
+          <a href="https://github.com/TonCerques" target="_blank" rel="noopener">github.com/TonCerques</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="foot">Wellington Cerqueira · Salvador, BA · atualizado em 2026</footer>
+
+<script>
+(function(){
+  // Project card expand
+  var toggle = document.getElementById('prdToggle');
+  var detail = document.getElementById('prdDetail');
+  toggle.addEventListener('click', function(){
+    var open = detail.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    toggle.textContent = open ? 'Fechar case study ↑' : 'Ver case study ↓';
+  });
+
+  // Impact counter (30 -> 2), respects reduced motion
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var target = document.getElementById('impactNum');
+  var impactSection = document.getElementById('impacto');
+  var animated = false;
+  function animateCounter(){
+    if (animated) return;
+    animated = true;
+    if (reduce) { target.textContent = '2'; return; }
+    var start = 30, end = 2, dur = 1100, t0 = performance.now();
+    function step(t){
+      var p = Math.min(1, (t - t0) / dur);
+      var eased = 1 - Math.pow(1 - p, 3);
+      var val = Math.round(start + (end - start) * eased);
+      target.textContent = val;
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){ if (e.isIntersecting) animateCounter(); });
+    }, { threshold: 0.5 });
+    io.observe(impactSection);
+  } else {
+    animateCounter();
+  }
+
+  // Console typing effect
+  var lines = [
+    { p: '$', k: 'python automatiza.py', rest: ' --tarefa "relatorio_embargos"' },
+    { p: '>', k: '', rest: 'lendo dados ................ ok' },
+    { p: '>', k: '', rest: 'limpando e normalizando ..... ok' },
+    { p: '>', k: '', rest: 'tempo anterior: 30 min' },
+    { p: '>', k: '', rest: 'tempo atual: 2 min' },
+    { p: '$', k: '', rest: 'status: concluído ✓' }
+  ];
+  var body = document.getElementById('consoleBody');
+  if (reduce) {
+    body.innerHTML = lines.map(function(l){
+      return '<span class="p">'+l.p+'</span> <span class="k">'+l.k+'</span>'+l.rest;
+    }).join('\n');
+  } else {
+    var li = 0, ci = 0, out = '';
+    function typeLine(){
+      if (li >= lines.length) {
+        body.innerHTML = out + '<span class="console-cursor"></span>';
+        return;
+      }
+      var line = lines[li];
+      var full = line.p + ' ' + (line.k ? line.k + ' ' : '') + line.rest;
+      if (ci <= full.length) {
+        body.innerHTML = out + '<span class="p">'+line.p+'</span> ' + (line.k ? '<span class="k">'+line.k.slice(0, Math.max(0,ci-2))+'</span> ' : '') + full.slice(line.k ? line.k.length+2 : 2, ci) + '<span class="console-cursor"></span>';
+        ci += 2;
+        setTimeout(typeLine, 12);
+      } else {
+        out += '<span class="p">'+line.p+'</span> ' + (line.k ? '<span class="k">'+line.k+'</span> ' : '') + line.rest + '\n';
+        li++; ci = 0;
+        setTimeout(typeLine, 180);
+      }
+    }
+    typeLine();
+  }
+})();
+</script>
+
+</body>
+</html>
